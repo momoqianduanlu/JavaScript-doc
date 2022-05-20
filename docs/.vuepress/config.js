@@ -60,7 +60,7 @@ module.exports = {
       }
     ],
     sidebar: {
-      '/webpack/': [webpackSidebar]
+      // '/webpack/': [webpackSidebar]
     }
   },
   configureWebpack: {
