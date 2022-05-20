@@ -17,13 +17,11 @@ const webpackSidebar = {
   ]
 }
 
-// http目录结构
-const httpSidebar = {
-  title: 'Http',
+// javascript目录结构
+const JavascriptSidebar = {
+  title: 'javascript',
   collapsable: false,
-  children: [
-    
-  ]
+  children: []
 }
 
 // typescript目录结构
@@ -33,9 +31,16 @@ const typescriptSidebar = {
   children: []
 }
 
+// vite目录结构
+const viteSidebar = {
+  title: 'vite',
+  collapsable: false,
+  children: []
+}
+
 module.exports = {
-  knowUpSidebar,
-  webpackSidebar,
-  httpSidebar,
-  typescriptSidebar
+  // webpackSidebar,
+  JavascriptSidebar,
+  typescriptSidebar,
+  viteSidebar
 }

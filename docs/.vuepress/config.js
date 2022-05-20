@@ -3,27 +3,30 @@ const { webpackSidebar } = nav
 
 module.exports = {
   base: '/JavaScript-doc/',
-  dest: 'dist',
   title: '前端知识清单',
   description: '对你的热爱要忠诚，对你的热爱要勤奋',
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }], // 增加一个自定义的 favicon(网页标签的图标)
+    ['link', { rel: 'icon', href: '/favicon.ico' }] // 增加一个自定义的 favicon(网页标签的图标)
   ],
   themeConfig: {
-    lastUpdated: '最后更新时间',
     sidebar: 'auto',
+    lastUpdated: '最后更新时间',
     nav: [
+      // {
+      //   text: 'webpack',
+      //   link: '/webpack/'
+      // },
       {
-        text: 'webpack',
-        link: '/webpack/'
+        text: 'Javascript专题',
+        link: '/javascript/'
       },
       {
-        text: 'typescript',
+        text: 'TypeScript',
         link: '/typescript/'
       },
       {
-        text: 'http协议',
-        link: '/http/'
+        text: 'Vite',
+        link: '/vite/'
       },
       {
         text: '前端书籍',
@@ -37,7 +40,7 @@ module.exports = {
               },
               {
                 text: '你不知道的JavaScript(中下)',
-                link: '/books/javascript/know-down'
+                link: '/books/javascript/knowDown'
               },
               {
                 text: '深入理解Es6',

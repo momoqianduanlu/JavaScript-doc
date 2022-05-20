@@ -2,6 +2,8 @@
 sidebar: auto
 ---
 
+# 你不知道的JavaScript(上)
+
 ## 深入理解javascript作用域 - 内部原理
 
 javascript拥有一套设计良好的规则来存储变量，并且之后可以方便地找到这些变量，这套规则被称为作用域。作用域貌似简单，实则复杂，由于作用域与[this机制](http://www.cnblogs.com/xiaohuochai/p/5735901.html)非常容易混淆，使得理解作用域的原理更为重要。本篇文章是深入理解javascript作用域系列的第一篇——内部原理
@@ -3832,4 +3834,27 @@ b.deep.count // 2
 
 ~~~
 
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 深入理解javascript函数第一篇 - 函数描述
+
+## 数据类型转换
+
+
+## 继承
 
