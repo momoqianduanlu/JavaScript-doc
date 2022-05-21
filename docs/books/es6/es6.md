@@ -5350,5 +5350,409 @@ console.log(sum(1, 2)); // 3
 
 
 ## Promise和异步编程
-    promise
+### 异步编程的背景知识
+
+`JavaScript`引擎是基于单线程事件循环的概念创建的，同一时间只允许一个代码块在执行，所以需要跟踪即将运行的代码。那些代码被放在一个叫做任务队列中，每当一段代码准备执行时，都会被添加到任务队列中。每当`JavaScript`引擎中的一段代码结束执行，事件循环会执行队列中的下一个任务，它是`JavaScript`引擎中的一段程序，负责监控代码执行并管理任务队列。
+
+#### 事件模型
+
+当用户点击按钮或者按下键盘上的按键时会触发类似`onClick`这样的事件，它会向任务队列添加一个新任务来响应用户的操作，这是`JavaScript`中最基础的异步编程模式，直到事件触发时才执行事件处理程序，且执行上下文与定义时的相同。
+
+```js
+let button = document.getElemenetById('myBtn')
+button.onClick = function () {
+  console.log('click!')
+}
+```
+
+事件模型适用于处理简单的交互，然而将多个独立的异步调用连接在一起会使程序更加复杂，因为我们必须跟踪每个事件的事件目标。
+
+#### 回调模式
+
+`Node.js`通过普及回调函数来改进异步编程模型，回调函数与事件模型类似，异步代码都会在未来的某个时间点执行，二者的区别是回调模式中被调用的函数是作为参数传入的，如下：
+
+```js
+readFile('example.pdf', function(err, contents) {
+  if (err) {
+    throw err
+  }
+  console.log(contents)
+})
+```
+
+我们可以发现回调模式比事件模型更灵活，因此通过回调模式链接多个调用更容易：
+
+```js
+readFile('example.pdf', function(err, contents) {
+  if (err) {
+    throw err
+  }
+  writeFile('example.pdf', function(err, contents) {
+    if (err) {
+      throw err
+    }
+    console.log('file was written!')
+  })
+})
+```
+
+我们可以发现，通过回调嵌套的形式，可以帮助我们解决许多问题，然而随着模块越来越复杂，回调模式需要嵌套的函数也越来越多，就形成了回调地狱，如下：
+
+```js
+method1(function(err, result) {
+  if (err) {
+    throw err
+  }
+  method2(function(err, result) {
+    if (err) {
+      throw err
+    }
+    method3(function(err, result) {
+      if (err) {
+        throw err
+      }
+      method4(function(err, result) {
+        if (err) {
+          throw err
+        }
+        method5(result)
+      })
+    })
+  })
+})
+```
+
+### Promise基础
+
+`Promise`相当于异步操作结果的占位符，它不会去订阅一个事件，也不会传递一个回调函数给目标函数，而是让函数返回一个`Promise`。
+
+#### Promise的生命周期
+
+每个`Promise`都会经历一个短暂的生命周期： 先是处于`pending`进行中的状态，此时操作尚未完成，所以它也是未处理状态的，一旦操作执行结束，`Promise`则变为已处理。操作结束后，`Promise`可能会进入到以下两个状态中的其中一个：
+
+- `Fulfilled`：异步操作成功完成。
+- `Rejected`：由于程序错误或者一些其他原因，异步操作未能成功完成。
+
+根据以上介绍的状态，`Promise`的内部属性`[[PromiseState]]`被用来表示这三种状态：`pending`、`fulfilled`和`rejected`。这个属性不会暴露在`Promise`对象上，所以不能通过编码的方式检测`Promise`的状态。
+
+#### Promise.then()方法
+
+我们已经知道，`Promise`会在操作完成之后进入`Fulfilled`和`Rejected`其中一个，而`Promise`提供了`Promise.then()`方法。它有两个参数，第一个是`Promise`的状态变为`fulfilled`时要调用的函数，第二个是当`Promise`状态变为`rejected`时调用的函数，其中这两个参数都是可选的。
+
+TIP
+
+如果一个对象实现了上述`.then()`方法，那么这个对象我们称之为`thenable`对象。
+
+```js
+let Promise = readFile('example.pdf')
+// 同时提供执行完成和执行被拒的回调
+Promise.then(function(content) {
+  console.log('complete')
+}, function(err) {
+  console.log(err.message)
+})
+// 仅提供完成的回调
+Promise.then(function(content) {
+  console.log('complete')
+})
+// 仅提供被拒的回调
+Promise.then(null, function(err) {
+  console.log(err.message)
+})
+```
+
+#### Promise.catch()方法
+
+`Promise`还有一个`catch()`方法，相当于只给其传入拒绝处理程序的`then()`方法，所以和以上最后一个例子等价的`catch()`代码如下：
+
+```js
+promise.catch(function(err) {
+  console.log(err.message)
+})
+// 等价于
+Promise.then(null, function(err) {
+  console.log(err.message)
+})
+```
+
+`then()`方法和`catch()`方法一起使用才能更好的处理异步操作结果。这套体系能够清楚的指明操作结果是成功还是失败，比事件和回调函数更好用。如果使用事件，在遇到错误时不会主动触发；如果使用回调函数，则必须要记得每次都检查错误参数。如果不给`Promise`添加拒绝处理程序，那所有失败就自动被忽略。
+
+#### 创建未完成的Promise
+
+用`Promise`构造函数可以创建新的`Promise`，构造函数只接受一个参数：包含初始化`Promise`代码的执行器函数。执行器函数接受两个参数，分别是`resolve`函数和`reject`函数。执行器成功完成时调用`resolve`函数，失败时则调用`reject`函数。
+
+```js
+let fs = require('fs')
+function readFile(filename) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, function (err, contents) {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(contents)
+    })
+  })
+}
+let promise = readFile('example.pdf')
+promise.then((contents) => {
+  console.log(contents)
+}, (err) => {
+  console.log(err.message)
+})
+```
+
+#### 创建已处理的Promise
+
+`Promise.resolve()`方法只接受一个参数并返回一个完成态的`Promise`，该方法永远不会存在拒绝状态，因而该`Promise`的拒绝处理程序永远不会被调用。
+
+```js
+let promise = Promise.resolve(123)
+promise.then(res => {
+  console.log(res) // 123
+})
+```
+
+可以使用`Promise.reject()`方法来创建已拒绝`Promise`，它与`Promise.resolve()`方法很像，唯一的区别是创建出来的是拒绝态的`Promise`。
+
+```js
+let promise = Promise.reject(123)
+promise.catch((err) => {
+  console.log(err) // 123
+})
+```
+
+#### 非Promise的Thenable对象
+
+`Promise.resolve()`方法和`Promise.reject()`方法都可以接受非`Promise`的`thenable`对象作为参数。如果传入一个非`Promise`的`thenable`对象，则这些方法会创建一个新的`Promise`，并在`then()`函数中被调用。
+拥有`then()`方法并且接受`resolve`和`reject`这两个参数的普通对象就是非`Promise`的`Thenable`对象。
+
+```js
+let thenable = {
+  then (resolve, reject) {
+    resolve(123)
+  }
+}
+let promise1 = Promise.resolve(thenable)
+promise1.then((res) => {
+  console.log(res) // 123
+})
+```
+
+#### 执行器错误
+
+如果执行器内部抛出一个错误，则`Promise`的拒绝处理程序就会被调用。
+
+```js
+let promise = new Promise((resolve, reject) => {
+  throw new Error('promise err')
+})
+promise.catch((err) => {
+  console.log(err.message) // promise err
+})
+```
+
+代码分析：在上面这段代码中，执行器故意抛出了一个错误，每个执行器中都隐含一个`try-catch`块，所以错误会被捕获并传入拒绝处理程序，以上代码等价于：
+
+```js
+let promise = new Promise((resolve, reject) => {
+  try {
+    throw new Error('promise err')
+  } catch (ex) {
+    reject(ex)
+  }
+})
+promise.catch((err) => {
+  console.log(err.message) // promise err
+})
+```
+
+### 串联Promise
+
+每当我们调用`then()`或者`catch()`方法时实际上创建并返回了另一个`Promise`，只有当第一个`Promise`完成或被拒绝后，第二个才会被解决。这给了我们可以将`Promise`串联起来实现更复杂的异步特性的方法。
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(123)
+})
+p1.then(res => {
+  console.log(res)      // 123
+}).then(res => {
+  console.log('finish') // finish
+})
+```
+
+如果我们将以上例子拆解开来，那么会是如下的情况：
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(123)
+})
+let p2 = p1.then(res => {
+  console.log(res)      // 123
+})
+p2.then(res => {
+  console.log('finish') // finish
+})
+```
+
+#### 串联Promise中捕获错误
+
+我们已经知道，一个`Promise`的完成处理程序或者拒绝处理程序都有可能发生错误，而在`Promise`链中是可以捕获这些错误的：
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(123)
+})
+p1.then(res => {
+  throw new Error('error')
+}).catch(error => {
+  console.log(error.message)  // error
+})
+```
+
+不仅可以捕获到`then()`方法中的错误，还可以捕获到`catch()`方法中的错误：
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(123)
+})
+
+p1.then(res => {
+  throw new Error('error then')
+}).catch(error => {
+  console.log(error.message)  // error then
+  throw new Error('error catch')
+}).catch(error => {
+  console.log(error.message)  // error catch
+})
+```
+
+#### Promise链返回值
+
+`Promise`链的一个重要特性就是可以给下游的`Promise`传递值。
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(1)
+})
+p1.then(res => {
+  console.log(res)  // 1
+  return res + 1
+}).then(res => {
+  console.log(res)  // 2
+  return res + 2
+}).then(res => {
+  console.log(res)  // 4
+})
+```
+
+#### 在Promise链中返回Promise
+
+我们在上面的例子中已经知道了，可以给下游的`Promise`传递值，但如果我们`return`的是另外一个`Promise`对象又该如何去走呢？实际上，这取决于这个`Promise`是完成还是拒绝，完成则会调用`then()`，拒绝则会调用`catch()`
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(1)
+})
+let p2 = new Promise((resolve, reject) => {
+  resolve(2)
+})
+let p3 = new Promise((resolve, reject) => {
+  reject(new Error('error p3'))
+})
+p1.then(res => {
+  console.log(res)            // 1
+  return p2
+}).then(res => {
+  // p2完成，会调用then()
+  console.log(res)            // 2
+})
+
+p1.then(res => {
+  console.log(res)            // 1
+  return p3
+}).catch((error) => {
+  // p3拒绝，会调用catch()
+  console.log(error.message)  // error p3
+})
+```
+
+### 响应对个Promise
+
+#### Promise.all()方法
+
+特点：`Promise.all()`方法只接受一个参数并返回一个`Promise`，且这个参数必须为一个或者多个`Promise`的可迭代对象(例如数组)，只有当这个参数中的所有`Promise`对象全部被解决后才返回这个`Promise`。另外一个地方值得注意的是：`Promise`返回值，是按照参数数组中的`Promise`顺序存储的，所以可以根据`Promise`所在参数中的位置的索引去最终结果的`Promise`数组中进行访问。
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  resolve(1)
+})
+let p2 = new Promise((resolve, reject) => {
+  resolve(2)
+})
+let p3 = new Promise((resolve, reject) => {
+  resolve(3)
+})
+let pAll = Promise.all([p1, p2, p3])
+pAll.then(res => {
+  console.log(res[0]) // 1：对应p1的结果
+  console.log(res[1]) // 2：对应p2的结果
+  console.log(res[2]) // 3：对应p3的结果
+})
+```
+
+#### Promise.race()方法
+
+特点：`Promise.race()`方法和`Promise.all()`方法对于参数是一致的，但是在行为和结果上有一点差别：`Promise.race()`方法接受参数数组，只要数组中的任意一个`Promise`被完成，那么`Promise.race()`方法就返回，所以`Promise.race()`方法的结果只有一个，也就是最先被解决的`Promise`的结果。
+
+```js
+let p1 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(1)
+  }, 100)
+})
+let p2 = new Promise((resolve, reject) => {
+  resolve(2)
+})
+let p3 = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(3)
+  }, 100)
+})
+let pRace = Promise.race([p1, p2, p3])
+pRace.then(res => {
+  console.log(res) // 2 对应p2的结果
+})
+```
+
+### 自Promise继承
+
+`Promise`与其他内建类型一样，也是可以当做基类派生其他类的。
+
+```js
+class MyPromise extends Promise {
+  // 派生Promise，并添加success方法和failure方法
+  success(resolve, reject) {
+    return this.then(resolve, reject)
+  }
+  failure(reject) {
+    return this.catch(reject)
+  }
+}
+let p1 = new MyPromise((resolve, reject) => {
+  resolve(1)
+})
+let p2 = new MyPromise((resolve, reject) => {
+  reject(new Error('mypromise error'))
+})
+p1.success(res => {
+  console.log(res)            // 1
+})
+p2.failure(error => {
+  console.log(error.message)  // mypromise error
+})
+```
+
+
 ## 代理(Proxy)和反射(Reflect)API
