@@ -1,5 +1,4 @@
 const nav = require('./utils/nav.js')
-const { webpackSidebar } = nav
 
 module.exports = {
   base: '/JavaScript-doc/',
@@ -12,21 +11,17 @@ module.exports = {
     sidebar: 'auto',
     lastUpdated: '最后更新时间',
     nav: [
-      // {
-      //   text: 'webpack',
-      //   link: '/webpack/'
-      // },
+      {
+        text: 'Javascript深入',
+        link: '/javascript1/'
+      },
       {
         text: 'Javascript专题',
-        link: '/javascript/'
+        link: '/javascript2/'
       },
       {
-        text: 'TypeScript',
-        link: '/typescript/'
-      },
-      {
-        text: 'Vite',
-        link: '/vite/'
+        text: 'Axios源码解析',
+        link: '/axios/'
       },
       {
         text: '前端书籍',
@@ -59,9 +54,7 @@ module.exports = {
         ]
       }
     ],
-    sidebar: {
-      // '/webpack/': [webpackSidebar]
-    }
+    sidebar: {}
   },
   configureWebpack: {
     resolve: {

@@ -5755,4 +5755,4 @@ p2.failure(error => {
 ```
 
 
-## 代理(Proxy)和反射(Reflect)API
+## 用模块封装代码
