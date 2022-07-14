@@ -3335,6 +3335,24 @@ var obj = {
 console.log(Object.values(obj)); //["lang", 22]
 ```
 
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
+## 深入理解 javascript 函数第一篇 - 函数描述
+
 ## 对象的深浅拷贝
 
 对象拷贝分为浅拷贝(shallow)和深拷贝(deep)两种。浅拷贝只复制一层对象的属性，并不会进行递归复制，而 javascript 存储对象都是存地址的，所以浅拷贝会导致对象中的子对象指向同一块内存地址；而深拷贝则不同，它不仅将原对象的各个属性逐个复制出去，而且将原对象各个属性所包含的对象也依次采用深拷贝的方法递归复制到新对象上，拷贝了所有层级。
@@ -3509,24 +3527,6 @@ const deepClone = (obj, hash = new WeakMap()) => {
   return cloneObj;
 };
 ```
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
-
-## 深入理解 javascript 函数第一篇 - 函数描述
 
 ## javascript 中的原始值和复杂值
 

@@ -12,12 +12,8 @@ module.exports = {
     lastUpdated: '最后更新时间',
     nav: [
       {
-        text: 'Javascript深入',
-        link: '/javascript1/'
-      },
-      {
         text: 'Javascript专题',
-        link: '/javascript2/'
+        link: '/javascript1/'
       },
       {
         text: 'Axios源码解析',
