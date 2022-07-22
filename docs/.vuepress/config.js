@@ -1,7 +1,7 @@
 const nav = require('./utils/nav.js')
 
 module.exports = {
-  base: '/JavaScript-doc/',
+  base: '/JavaScript-blog/',
   title: '前端知识清单',
   description: '对你的热爱要忠诚，对你的热爱要勤奋',
   head: [
@@ -14,6 +14,10 @@ module.exports = {
       {
         text: 'Javascript专题',
         link: '/javascript1/'
+      },
+      {
+        text: 'Web协议专题',
+        link: '/agreement/'
       },
       {
         text: 'Axios源码解析',
