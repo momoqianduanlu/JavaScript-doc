@@ -23,8 +23,6 @@ sidebar: auto
 
 > 数组可以存放任意类型的值：数字，字符串，布尔，对象，甚至是另一个数组。
 
-#### 稀疏数组
-
 **稀疏数组**：数组中含有空白或者空缺单元的数组。
 
 ```js
@@ -35,8 +33,6 @@ arr[2] = 2;
 console.log(arr[1]); // 输出 undefined
 console.log(arr.length); // 输出 3
 ```
-
-#### 类数组
 
 **类数组**：与数组的结果类似，但并不是真正的数组。
 
@@ -750,3 +746,42 @@ let obj = {
 console.log(jsonStringify(obj) === JSON.stringify(obj));
 // true
 ```
+
+### 手动实现 call apply bind 方法
+
+```js
+Function.prototype.call = function(context, ...args) {
+  // context 新的this指向，args 函数形参列表
+  let context = context || window;
+  // 给context添加一个方法指向this
+  context.fn = this;
+  let result = eval("context.fn(...args)");
+  delete context.fn;
+  return result;
+};
+```
+
+```js
+Function.prototype.apply = function(context, args) {
+  let context = context || window;
+  context.fn = this;
+  let result = eval("context.fn(...args)");
+  delete context.fn;
+  return result;
+};
+```
+
+```js
+Function.prototype.bind = function(context) {
+  let self = this;
+  return function() {
+    return self.apply(context, ...arguments);
+  };
+};
+```
+
+#### 为什么要用 eval
+
+首先，你需要先仔细学一下 eval 函数；其次，使用 eval 函数会帮我们进行了处理，隐藏执行了等效于 toString() 的操作，你要知道从上面传过来的参数是需要作为 context.fn 这个函数的参数一次性执行完成的，这里传进来如果参数是数组的话也是不能直接作为参数传递给 context.fn 的，因此通过 eval 函数把他们全部变成字符串作为要执行的函数的参数传进来进行执行的。最后要是还是不理解的话可以看下这两点：[1,2,3].toString() 在控制台输出的结果是什么？另外再理解一下 eval 这个函数的作用
+
+![call-apply-bind](../../images/book/call-apply-bind.png)
