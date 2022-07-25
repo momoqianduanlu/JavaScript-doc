@@ -3337,21 +3337,527 @@ console.log(Object.values(obj)); //["lang", 22]
 
 ## 深入理解 javascript 函数第一篇 - 函数描述
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+函数对任何一门语言来说都是核心的概念。通过函数可以封装任意多条语句，而且可以在任何地方、任何时候调用执行。在 javascript 里，函数即对象，程序可以随意操控它们。函数可以嵌套在其他函数中定义，这样它们就可以访问它们被定义时所处的作用域中的任何变量，它给 javascript 带来了非常强劲的编程能力。
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+### 函数定义
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+总共有三种函数定义的方式
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+1. 函数声明语句
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+   使用 function 关键字，后跟一组参数以及函数体
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+   ```javascript
+   function funcname([arg1 [,arg2 [...,argn]]]){
+       statement;
+   }
+   ```
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+   funcname 是要声明的函数名称的标识符。函数名之后的圆括号中是参数列表，参数之间使用逗号分隔。当调用函数时，这些标识符则指代传入函数的实参
 
-## 深入理解 javascript 函数第一篇 - 函数描述
+   > function 语句里的花括号是必需的，这和 while 循环和其他一些语句所使用的语句块是不同的，即使函数体内只包含一条语句，仍然必须使用花括号将其括起来
+
+   ```javascript
+   function test()//SyntaxError: Unexpected end of input
+   function test(){};//不报错
+   while(true);//不报错
+   ```
+
+   **提升**
+
+   在作用域系列博文中，提到过函数声明提升(hoisting)，函数名称和函数体都提升
+
+   ```javascript
+   foo();
+   function foo() {
+     console.log(1); //1
+   }
+   ```
+
+   上面这个代码片段之所以能够在控制台输出 1，就是因为 foo()函数声明进行了提升，如下所示：
+
+   ```javascript
+   function foo() {
+     console.log(1);
+   }
+   foo();
+   ```
+
+   **重复**
+
+   变量的重复声明是无用的，但函数的重复声明会覆盖前面的声明(无论是变量还是函数声明)
+
+   ```javascript
+   //变量的重复声明无用
+   var a = 1;
+   var a;
+   console.log(a); //1
+   //由于函数声明提升优先于变量声明提升，所以变量的声明无作用
+   var a;
+   function a() {
+     console.log(1);
+   }
+   a(); //1
+   //后面的函数声明会覆盖前面的函数声明
+   a(); //2
+   function a() {
+     console.log(1);
+   }
+   function a() {
+     console.log(2);
+   }
+   ```
+
+   所以，应该避免在同一作用域中重复声明
+
+   **删除**
+
+   和变量声明一样，函数声明语句创建的变量无法删除
+
+   ```javascript
+   function foo() {
+     console.log(1);
+   }
+   delete foo; //false
+   console.log(foo()); //1
+   ```
+
+2. 函数定义表达式
+
+   以表达式方式定义的函数，函数的名称是可选的
+
+   ```javascript
+   var functionName = function([arg1 [,arg2 [...,argn]]]){
+       statement;
+   }
+
+   var functionName = function funcName([arg1 [,arg2 [...,argn]]]){
+       statement;
+   }
+   ```
+
+   匿名函数(anonymous function)也叫拉姆达函数，是 function 关键字后面没有标识符的函数
+
+   通常而言，以表达式方式定义函数时都不需要名称，这会让定义它们的代码更加紧凑。函数定义表达式特别适合用来定义那些只会使用一次的函数
+
+   ```javascript
+   var tensquared = (function(x) {
+     return x * x;
+   })(10);
+   ```
+
+   而一个函数定义表达式包含名称，函数的局部作用域将会包含一个绑定到函数对象的名称。实际上，函数的名称将成为函数内部的一个局部变量
+
+   ```javascript
+   var test = function fn() {
+     return fn;
+   };
+   console.log(test); //fn(){return fn;}
+   console.log(test()); //fn(){return fn;}
+   console.log(test()()); //fn(){return fn;}
+   ```
+
+   个人理解，对于具名的函数表达式来说，函数名称相当于函数对象的形参，只能在函数内部使用；而变量名称相当于函数对象的实参，在函数内部和函数外部都可以使用
+
+   ```javascript
+   var test = function fn() {
+     return fn === test;
+   };
+   console.log(test()); //true
+   console.log(test === fn); //ReferenceError: fn is not defined
+   ```
+
+   函数定义了一个非标准的 name 属性，通过这个属性可以访问到给定函数指定的名字，这个属性的值永远等于跟在 function 关键字后面的标识符，匿名函数的 name 属性为空
+
+   ```javascript
+   //IE11-浏览器无效，均输出undefined
+   //chrome在处理匿名函数的name属性时有问题，会显示函数表达式的名字
+   function fn() {}
+   console.log(fn.name); //'fn'
+   var fn = function() {};
+   console.log(fn.name); //''，在chrome浏览器中会显示'fn'
+   var fn = function abc() {};
+   console.log(fn.name); //'abc'
+   ```
+
+3. Function 构造函数
+
+   Function 构造函数接收任意数量的参数，但最后一个参数始终都被看成是函数体，而前面的参数则枚举出了新函数的参数
+
+   ```javascript
+   var functionName = new Function(['arg1' [,'arg2' [...,'argn']]],'statement;');
+   ```
+
+   [注意]Function 构造函数无法指定函数名称，它创建的是一个匿名函数
+
+   从技术上讲，这是一个函数表达式。但，不推荐使用，因为这种语法会导致解析两次代码。第一次是解析常规 javascript 代码，第二次解析传入构造函数中的字符串，影响性能
+
+   ```javascript
+   var sum = new Function("num1", "num2", "return num1 + num2");
+   //等价于
+   var sum = function(num1, num2) {
+     return num1 + num2;
+   };
+   ```
+
+   Function()构造函数创建的函数，其函数体的编译总是会在全局作用域中执行。于是，Function()构造函数类似于在全局作用域中执行的 eval()
+
+   ```javascript
+   var test = 0;
+   function fn() {
+     var test = 1;
+     return new Function("return test");
+   }
+   console.log(fn()()); //0
+   ```
+
+   [注意]并不是所有的函数都可以成为构造函数
+
+   ```javascript
+   var o = new Math.min(); //Uncaught TypeError: Math.min is not a constructor
+   ```
+
+### 函数返回值
+
+函数中的 return 语句用来返回函数调用后的返回值
+
+```javascript
+return expression;
+```
+
+return 语句只能出现在函数体内，如果不是会报语法错误
+
+```javascript
+return 1; //SyntaxError: Illegal return statement
+```
+
+如果没有 return 语句，则函数调用仅仅依次执行函数体内的每一条语句直到函数结束，最后返回调用程序。这种情况下，调用表达式的结果是 undefined
+
+```javascript
+var test = function fn() {};
+console.log(test()); //undefined
+```
+
+当执行到 return 语句时，函数终止执行，并返回 expression 的值给调用程序
+
+```javascript
+var test = function fn() {
+  return 2;
+};
+console.log(test()); //2
+```
+
+并不是函数中 return 语句后的所有语句都不执行，finally 例外，return 语句不会阻止 finally 子句的执行
+
+```javascript
+function testFinnally() {
+  try {
+    return 2;
+  } catch (error) {
+    return 1;
+  } finally {
+    return 0;
+  }
+}
+testFinnally(); //0
+```
+
+由于 javascript 可以自动插入分号，因此在 return 关键字和它后面的表达式之间不能有换行
+
+```javascript
+var test = function fn() {
+  return;
+  2;
+};
+console.log(test()); //undefined
+```
+
+一个函数中可以有多个 return 语句
+
+```javascript
+function diff(iNum1, iNum2) {
+  if (iNum1 > iNum2) {
+    return iNum1 - iNum2;
+  } else {
+    return iNum2 - iNum1;
+  }
+}
+```
+
+return 语句可以单独使用而不必带有 expression，这样的话也会向调用程序返回 undefined
+
+```javascript
+var test = function fn() {
+  return;
+};
+console.log(test()); //undefined
+```
+
+return 语句经常作为函数内的最后一条语句出现，这是因为 return 语句可用来使函数提前返回。当 return 被执行时，函数立即返回而不再执行余下的语句
+
+```javascript
+//并没有弹出1
+var test = function fn() {
+  return;
+  alert(1);
+};
+console.log(test()); //undefined
+```
+
+如果函数调用时在前面加上了 new 前缀，且返回值不是一个对象，则返回 this(该新对象)
+
+```javascript
+function fn() {
+  this.a = 2;
+  return 1;
+}
+var test = new fn();
+console.log(test); //{a:2}
+console.log(test.constructor); //fn(){this.a = 2;return 1;}
+```
+
+如果返回值是一个对象，则返回该对象
+
+```javascript
+function fn() {
+  this.a = 2;
+  return { a: 1 };
+}
+var test = new fn();
+console.log(test); //{a:1}
+console.log(test.constructor); //Object() { [native code] }
+```
+
+## 深入理解 javascript 函数第二篇-函数参数
+
+javascript 函数的参数与大多数其他语言的函数的参数有所不同。函数不介意传递进来多少个参数，也不在乎传进来的参数是什么数据类型，甚至可以不传参数。本文是深入理解 javascript 函数系列第二篇——函数参数
+
+### arguments
+
+javascript 中的函数定义并未指定函数形参的类型，函数调用也未对传入的实参值做任何类型检查。实际上，javascript 函数调用甚至不检查传入形参的个数
+
+```javascript
+function add(x) {
+  return x + 1;
+}
+console.log(add(1)); //2
+console.log(add("1")); //'11'
+console.log(add()); //NaN
+console.log(add(1, 2)); //2
+```
+
+**同名形参**
+
+在非严格模式下，函数中可以出现同名形参，且只能访问最后出现的该名称的形参
+
+```javascript
+function add(x, x, x) {
+  return x;
+}
+console.log(add(1, 2, 3)); //3
+```
+
+而在严格模式下，出现同名形参会抛出语法错误
+
+```javascript
+function add(x, x, x) {
+  "use strict";
+  return x;
+}
+console.log(add(1, 2, 3)); //SyntaxError: Duplicate parameter name not allowed in this context
+```
+
+**参数个数**
+
+当实参比函数声明指定的形参个数要少，剩下的形参都将设置为 undefined 值
+
+```javascript
+function add(x, y) {
+  console.log(x, y); //1 undefined
+}
+add(1);
+```
+
+常常使用逻辑或运算符给省略的参数设置一个合理的默认值
+
+```javascript
+function add(x, y) {
+  y = y || 2;
+  console.log(x, y); //1 2
+}
+add(1);
+```
+
+实际上，使用 y || 2 是不严谨的，显式地设置假值(undefined、null、false、0、-0、''、NaN)也会得到相同的结果。所以应该根据实际场景进行合理设置
+
+当实参比形参个数要多时，剩下的实参没有办法直接获得，需要使用即将提到的 arguments 对象
+
+javascript 中的参数在内部用一个数组表示。函数接收到的始终都是这个数组，而不关心数组中包含哪些参数。在函数体内可以通过 arguments 对象来访问这个参数数组，从而获取传递给函数的每一个参数。arguments 对象并不是 Array 的实例，它是一个类数组对象，可以使用方括号语法访问它的每一个元素
+
+```javascript
+function add(x) {
+  console.log(arguments[0], arguments[1], arguments[2]); //1 2 3
+  return x + 1;
+}
+add(1, 2, 3);
+```
+
+arguments 对象的 length 属性显示实参的个数，函数的 length 属性显示形参的个数
+
+```javascript
+function add(x, y) {
+  console.log(arguments.length); //3
+  return x + 1;
+}
+add(1, 2, 3);
+console.log(add.length); //2
+```
+
+形参只是提供便利，但不是必需的
+
+```javascript
+function add() {
+  return arguments[0] + arguments[1];
+}
+console.log(add(1, 2)); //3
+```
+
+### 内部属性
+
+**【callee】**
+
+arguments 对象有一个名为 callee 的属性，该属性是一个指针，指向拥有这个 arguments 对象的函数
+
+下面是经典的阶乘函数
+
+```javascript
+function factorial(num) {
+  if (num <= 1) {
+    return 1;
+  } else {
+    return num * factorial(num - 1);
+  }
+}
+console.log(factorial(5)); //120
+```
+
+但是，上面这个函数的执行与函数名紧紧耦合在了一起，可以使用 arguments.callee 可以消除函数解耦
+
+```javascript
+function factorial(num) {
+  if (num <= 1) {
+    return 1;
+  } else {
+    return num * arguments.callee(num - 1);
+  }
+}
+console.log(factorial(5)); //120
+```
+
+但在严格模式下，访问这个属性会抛出 TypeError 错误
+
+```javascript
+function factorial(num) {
+  "use strict";
+  if (num <= 1) {
+    return 1;
+  } else {
+    return num * arguments.callee(num - 1);
+  }
+}
+//TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them
+console.log(factorial(5));
+```
+
+这时，可以使用具名的函数表达式
+
+```javascript
+var factorial = function fn(num) {
+  if (num <= 1) {
+    return 1;
+  } else {
+    return num * fn(num - 1);
+  }
+};
+console.log(factorial(5)); //120
+```
+
+### 函数重载
+
+javascript 函数不能像传统意义上那样实现重载。而在其他语言中，可以为一个函数编写两个定义，只要这两个定义的签名(接受的参数的类型和数量)不同即可
+
+javascript 函数没有签名，因为其参数是由包含 0 或多个值的数组来表示的。而没有函数签名，真正的重载是不可能做到的
+
+```javascript
+//后面的声明覆盖了前面的声明
+function addSomeNumber(num) {
+  return num + 100;
+}
+function addSomeNumber(num) {
+  return num + 200;
+}
+var result = addSomeNumber(100); //300
+```
+
+只能通过检查传入函数中参数的类型和数量并作出不同的反应，来模仿方法的重载
+
+```javascript
+function doAdd() {
+  if (arguments.length == 1) {
+    alert(arguments[0] + 10);
+  } else if (arguments.length == 2) {
+    alert(arguments[0] + arguments[1]);
+  }
+}
+doAdd(10); //20
+doAdd(30, 20); //50
+```
+
+### 参数传递
+
+javascript 中所有函数的参数都是按值传递的。也就是说，把函数外部的值复制到函数内部的参数，就和把值从一个变量复制到另一个变量一样
+
+1. 基本类型值
+
+在向参数传递基本类型的值时，被传递的值会被复制给一个局部变量(命名参数或 arguments 对象的一个元素)
+
+```javascript
+function addTen(num) {
+  num += 10;
+  return num;
+}
+var count = 20;
+var result = addTen(count);
+console.log(count); //20，没有变化
+console.log(result); //30
+```
+
+2. 引用类型值
+
+在向参数传递引用类型的值时，会把这个值在内存中的地址复制给一个局部变量，因此这个局部变量的变化会反映在函数的外部
+
+```javascript
+function setName(obj) {
+  obj.name = "test";
+}
+var person = new Object();
+setName(person);
+console.log(person.name); //'test'
+```
+
+当在函数内部重写引用类型的形参时，这个变量引用的就是一个局部对象了。而这个局部对象会在函数执行完毕后立即被销毁
+
+```javascript
+function setName(obj) {
+  obj.name = "test";
+  console.log(person.name); //'test'
+  obj = new Object();
+  obj.name = "white";
+  console.log(person.name); //'test'
+}
+var person = new Object();
+setName(person);
+```
 
 ## 对象的深浅拷贝
 
@@ -4536,7 +5042,7 @@ URIError.valueOf(); //URIError() { [native code] }
 
    #### 隐式类型转换
 
-   ​ 凡是遇到 逻辑运算符`( && || !)` ，运算符 `(+ - * /)`，关系运算符 `(> < >= <=)`，相等运算符 `( ==)`，以及 `if while` 语句，如果遇到两个操作符类型不一致的情况，就会发生隐式类型转换。
+   凡是遇到 逻辑运算符`( && || !)` ，运算符 `(+ - * /)`，关系运算符 `(> < >= <=)`，相等运算符 `( ==)`，以及 `if while` 语句，如果遇到两个操作符类型不一致的情况，就会发生隐式类型转换。
 
    ##### '==' 的隐式类型转换规则
 
