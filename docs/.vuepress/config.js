@@ -13,7 +13,11 @@ module.exports = {
     nav: [
       {
         text: 'Javascript专题',
-        link: '/javascript1/'
+        link: '/subjectJs/'
+      },
+      {
+        text: '浏览器专题',
+        link: '/browser/'
       },
       {
         text: 'Web协议专题',
