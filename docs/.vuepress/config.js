@@ -12,20 +12,12 @@ module.exports = {
     lastUpdated: '最后更新时间',
     nav: [
       {
-        text: 'Javascript专题',
-        link: '/subjectJs/'
-      },
-      {
         text: '浏览器专题',
         link: '/browser/'
       },
       {
         text: 'Web协议专题',
         link: '/agreement/'
-      },
-      {
-        text: 'Axios源码解析',
-        link: '/axios/'
       },
       {
         text: '前端书籍',

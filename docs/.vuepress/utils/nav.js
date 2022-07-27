@@ -1,6 +1,6 @@
-// javascript目录结构
-const JavascriptSidebar = {
-  title: 'javascript',
+// 浏览器专题目录结构
+const browserSidebar = {
+  title: '浏览器专题',
   collapsable: false,
   children: []
 }
@@ -12,15 +12,7 @@ const webAgreementSidebar = {
   children: []
 }
 
-// axios源码解析目录结构
-const axiosSidebar = {
-  title: 'axios源码解析',
-  collapsable: false,
-  children: []
-}
-
 module.exports = {
-  JavascriptSidebar,
+  browserSidebar,
   webAgreementSidebar,
-  axiosSidebar
 }
