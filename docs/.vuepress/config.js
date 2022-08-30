@@ -12,11 +12,15 @@ module.exports = {
     lastUpdated: '最后更新时间',
     nav: [
       {
+        text: 'vue源码解析',
+        link: 'https://momoqianduanlu.github.io/vue-analysis-blog/'
+      },
+      {
         text: '浏览器专题',
         link: '/browser/'
       },
       {
-        text: 'Web协议专题',
+        text: '网络协议专题',
         link: '/agreement/'
       },
       {
