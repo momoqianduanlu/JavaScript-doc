@@ -5709,6 +5709,4 @@ p2.failure((error) => {
 
 ## 用模块封装代码
 
-https://chrome.google.com/webstore/detail/console-importer/hgajpakhafplebkdljleajgbpdmplhie
-分享个浏览器插件 👉（直接在浏览器控制台拉取 npm 包测试 api 方法，无需在项目中安装再进行测试，npm 私服配置允许后也可使用）
-https://github.com/pd4d10/console-importer
+
