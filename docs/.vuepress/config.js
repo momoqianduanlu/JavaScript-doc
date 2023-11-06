@@ -12,6 +12,10 @@ module.exports = {
     lastUpdated: '最后更新时间',
     nav: [
       {
+        text: 'vue技术内幕',
+        link: '/books/vue3/'
+      },
+      {
         text: 'vue源码解析',
         link: 'https://momoqianduanlu.github.io/vue-analysis-blog/'
       },
