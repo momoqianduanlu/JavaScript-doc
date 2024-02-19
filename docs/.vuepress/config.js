@@ -12,12 +12,30 @@ module.exports = {
     lastUpdated: '最后更新时间',
     nav: [
       {
-        text: 'vue技术内幕',
-        link: '/books/vue3/'
+        text: 'Vue源码',
+        items: [
+          {
+            text: 'vue技术内幕',
+            link: '/books/vue3/'
+          },
+          {
+            text: 'vue源码解析',
+            link: 'https://momoqianduanlu.github.io/vue-analysis-blog/'
+          },
+        ]
       },
       {
-        text: 'vue源码解析',
-        link: 'https://momoqianduanlu.github.io/vue-analysis-blog/'
+        text: 'Typescript',
+        items: [
+          {
+            text: 'ts进阶指南',
+            link: ''
+          },
+          {
+            text: 'ts类型挑战',
+            link: ''
+          },
+        ]
       },
       {
         text: '浏览器专题',
