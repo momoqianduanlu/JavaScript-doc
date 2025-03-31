@@ -16,7 +16,7 @@ module.exports = {
         items: [
           {
             text: 'vue技术内幕',
-            link: '/books/vue3/'
+            link: 'https://momoqianduanlu.github.io/vue-next-blog/'
           },
           {
             text: 'vue源码解析',
@@ -25,21 +25,30 @@ module.exports = {
         ]
       },
       {
-        text: 'Typescript',
+        text: 'NodeJs',
+        link: '/node/',
+      },
+      {
+        text: '数据库',
         items: [
           {
-            text: 'ts进阶指南',
-            link: ''
-          },
-          {
-            text: 'ts类型挑战',
-            link: ''
+            text: 'mysql数据库安装到实战',
+            link: '/database/mysql/'
           },
         ]
       },
       {
         text: '浏览器专题',
-        link: '/browser/'
+        items: [
+          {
+            text: '浏览器工作原理',
+            link: '/browser/'
+          },
+          {
+            text: 'v8引擎',
+            link: '/browser/v8'
+          },
+        ]
       },
       {
         text: '网络协议专题',
@@ -68,8 +77,8 @@ module.exports = {
                 link: '/books/algorithm'
               },
               {
-                text: '精通正则表达式',
-                link: '/books/regexp/'
+                text: 'vue技术内幕',
+                link: '/books/vue3/'
               }
             ]
           }
